@@ -40,8 +40,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         String moviePoster = movie.getPosterPath();
         Picasso.get()
                 .load(moviePoster)
-                .placeholder(R.drawable.ic_movie_pink_800_24dp)
-                .error(R.drawable.ic_movie_pink_800_24dp)
+                .placeholder(R.drawable.movie_image)
+                .error(R.drawable.movie_image)
                 .into(holder.movieImageView);
 
     }

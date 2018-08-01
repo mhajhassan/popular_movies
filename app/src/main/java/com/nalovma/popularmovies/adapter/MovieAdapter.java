@@ -46,6 +46,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     }
 
+    public Movie getItem(int position) {
+        return movieList.get(position);
+    }
+
     @Override
     public int getItemCount() {
         return movieList.size();

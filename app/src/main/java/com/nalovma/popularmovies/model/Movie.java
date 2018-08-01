@@ -8,8 +8,9 @@ public class Movie {
     private String posterPath;
     private String backdropPath;
     private String plot;
+    private String releaseDate;
 
-    public Movie(int id, String title, int voteCount, double voteAverage, String posterPath, String backdropPath, String plot) {
+    public Movie(int id, String title, int voteCount, double voteAverage, String posterPath, String backdropPath, String plot, String releaseDate) {
         this.id = id;
         this.title = title;
         this.voteCount = voteCount;
@@ -17,6 +18,7 @@ public class Movie {
         this.posterPath = posterPath;
         this.backdropPath = backdropPath;
         this.plot = plot;
+        this.releaseDate = releaseDate;
     }
 
     public int getId() {
@@ -45,5 +47,9 @@ public class Movie {
 
     public String getPlot() {
         return plot;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
     }
 }

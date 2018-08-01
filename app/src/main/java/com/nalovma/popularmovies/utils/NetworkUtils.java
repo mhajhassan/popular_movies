@@ -40,6 +40,7 @@ public class NetworkUtils {
 
     public static List<Movie> fetchMoviesData(String requestUrl) {
         URL url = createUrl(requestUrl);
+        Log.d("url", url.toString());
         String jsonResponse = null;
 
         try {
@@ -167,8 +168,8 @@ public class NetworkUtils {
                 String posterPath = currentMovie.optString("poster_path", "no_image");
                 String backdropPath = currentMovie.optString("backdrop_path", "no_image");
                 String plot = currentMovie.optString("overview", "no_overview");
-
-                Movie movie = new Movie(id, title, voteCount, voteAverage, createImageUrl(posterPath), createImageUrl(backdropPath), plot);
+                String releaseDate = currentMovie.optString("release_date", "no_release_date");
+                Movie movie = new Movie(id, title, voteCount, voteAverage, createImageUrl(posterPath), createImageUrl(backdropPath), plot, releaseDate);
                 movieList.add(movie);
             }
         } catch (JSONException e) {

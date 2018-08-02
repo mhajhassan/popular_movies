@@ -1,6 +1,8 @@
 package com.nalovma.popularmovies;
 
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -39,8 +41,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     @Override
     public void onItemClick(View view, int position) {
-        Movie movie = mAdapter.getItem(position);
-        showErrorMessage(movie.getTitle());
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.putExtra(getString(R.string.extra_movie_id), position);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, view.findViewById(R.id.iv_poster), getString(R.string.transition_poster)).toBundle());
     }
 
     class createMovieList extends AsyncTask<String, Void, List<Movie>> {
@@ -57,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         @Override
         protected void onPostExecute(List<Movie> movies) {
             if (movies != null && !movies.isEmpty()) {
+//                NetworkUtils.movieList.clear();
+                NetworkUtils.movieList.addAll(movies);
                 showContent(movies);
             } else {
                 showErrorMessage(getString(R.string.no_movies));
@@ -74,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     private void showErrorMessage(String message) {
-        Toast.makeText(this,message,Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     // this method checks the connectivity and return true when it's connected and false when it's not connected

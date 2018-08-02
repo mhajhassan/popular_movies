@@ -3,4 +3,6 @@
     <string name="popular_movies">Popular Movies</string>
     <string name="top_rated_movie">Top Rated Movie</string>
     <string name="no_movies">No Movies found</string>
+    <string name="extra_movie_id">movieId</string>
+    <string name="transition_poster">transition_poster</string>
 </resources>

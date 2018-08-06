@@ -19,6 +19,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private List<Movie> movieList;
     private ItemClickListener mClickListener;
 
+    /**
+     * Constructs a new {@link MovieAdapter}.
+     */
     public MovieAdapter(List<Movie> movieList) {
         this.movieList = movieList;
     }
@@ -34,6 +37,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         return new MovieViewHolder(view);
     }
 
+    /**
+     * Called by RecyclerView to display the data at the specified position.
+     */
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         Movie movie = movieList.get(position);
@@ -46,6 +52,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     }
 
+    /*
+     * return movie item by position
+     * */
     public Movie getItem(int position) {
         return movieList.get(position);
     }
@@ -55,6 +64,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         return movieList.size();
     }
 
+    /**
+     * Cache of the children views for a movie list.
+     */
     class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView movieImageView;

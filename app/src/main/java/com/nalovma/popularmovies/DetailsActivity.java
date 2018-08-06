@@ -11,6 +11,8 @@ import com.nalovma.popularmovies.model.Movie;
 import com.nalovma.popularmovies.utils.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import java.util.Locale;
+
 public class DetailsActivity extends AppCompatActivity {
 
     ImageView mBackdropIv;
@@ -35,6 +37,9 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     * initialize the views
+     */
     void initView() {
         mBackdropIv = findViewById(R.id.iv_backdrop);
         mPosterIv = findViewById(R.id.iv_poster);
@@ -45,12 +50,15 @@ public class DetailsActivity extends AppCompatActivity {
         mVoteAverageRb = findViewById(R.id.rb_vote_average);
     }
 
+    /**
+     * Populates the UI with the data from the Movie object.
+     */
     void populateUI(final Movie movie) {
         mTitleTv.setText(movie.getTitle());
         mReleaseDateTv.setText(movie.getReleaseDate());
-        mVoteCountTv.setText(Integer.toString(movie.getVoteCount()));
+        mVoteCountTv.setText(String.format(Locale.US, "(%03d)", movie.getVoteCount()));
         mOverviewTv.setText(movie.getPlot());
-        mVoteAverageRb.setRating((float) movie.getVoteAverage()/2);
+        mVoteAverageRb.setRating((float) movie.getVoteAverage() / 2f);
         Picasso.get()
                 .load(movie.getPosterPath())
                 .placeholder(R.drawable.movie_image)

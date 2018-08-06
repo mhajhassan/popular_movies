@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.nalovma.popularmovies.R;
 import com.nalovma.popularmovies.model.Movie;
 
 import org.json.JSONArray;
@@ -26,7 +27,6 @@ public class NetworkUtils {
     /**
      * Tag for the log messages
      */
-
     private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
 
     private final static String BASE_URL = "http://api.themoviedb.org/3";
@@ -37,6 +37,19 @@ public class NetworkUtils {
     private final static String PATH_IMAGE_WIDTH = "w185";
     // Base url for images
     private final static String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
+
+    // String Constants for parsing the Json String
+    private static final String RESULTS = "results";
+    private static final String ID = "id";
+    private static final String TITLE = "title";
+    private static final String VOTE_COUNT = "vote_count";
+    private static final String VOTE_AVERAGE = "vote_average";
+    private static final String RELEASE_DATE = "release_date";
+    private static final String OVERVIEW = "overview";
+    private static final String POSTER_PATH = "poster_path";
+    private static final String BACKDROP_PATH = "backdrop_path";
+    // no data string
+    private static final String NO_DATA = "No Data";
 
 
     public static List<Movie> fetchMoviesData(String requestUrl) {
@@ -149,6 +162,9 @@ public class NetworkUtils {
         return output.toString();
     }
 
+    /*
+     * parse the json response
+     */
     private static List<Movie> extractJsonResponse(String response) {
         if (TextUtils.isEmpty(response)) {
             return null;
@@ -158,18 +174,18 @@ public class NetworkUtils {
 
         try {
             JSONObject baseJsonObject = new JSONObject(response);
-            JSONArray jsonArray = baseJsonObject.optJSONArray("results");
+            JSONArray jsonArray = baseJsonObject.optJSONArray(RESULTS);
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject currentMovie = jsonArray.optJSONObject(i);
-                int id = currentMovie.optInt("id", 0);
-                String title = currentMovie.optString("title", "no_title");
-                int voteCount = currentMovie.optInt("vote_count", 0);
-                double voteAverage = currentMovie.optDouble("vote_average", 0.0);
-                String posterPath = currentMovie.optString("poster_path", "no_image");
-                String backdropPath = currentMovie.optString("backdrop_path", "no_image");
-                String plot = currentMovie.optString("overview", "no_overview");
-                String releaseDate = currentMovie.optString("release_date", "no_release_date");
+                int id = currentMovie.optInt(ID, 0);
+                String title = currentMovie.optString(TITLE, NO_DATA);
+                int voteCount = currentMovie.optInt(VOTE_COUNT, 0);
+                double voteAverage = currentMovie.optDouble(VOTE_AVERAGE, 0.0);
+                String posterPath = currentMovie.optString(POSTER_PATH, NO_DATA);
+                String backdropPath = currentMovie.optString(BACKDROP_PATH, NO_DATA);
+                String plot = currentMovie.optString(OVERVIEW, NO_DATA);
+                String releaseDate = currentMovie.optString(RELEASE_DATE, NO_DATA);
                 Movie movie = new Movie(id, title, voteCount, voteAverage, createImageUrl(posterPath), createImageUrl(backdropPath), plot, releaseDate);
                 movieList.add(movie);
             }

@@ -13,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nalovma.popularmovies.adapter.MovieAdapter;
@@ -27,18 +29,34 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     final static String TOP_RATED_MOVIE = "top_rated";
     private MovieAdapter mAdapter;
     private RecyclerView mMoviesList;
+    private TextView mEmptyStateTV;
+    private ProgressBar mLoadingProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
+        if (checkConnectivity()) {
+            new createMovieList().execute(POPULAR_MOVIE);
+            setTitle(R.string.popular_movies);
+        } else {
+            showErrorMessage(getString(R.string.no_internet));
+        }
     }
 
+    // initializing the views
     private void initViews() {
         mMoviesList = findViewById(R.id.rv_movies);
+        mEmptyStateTV = findViewById(R.id.empty_message);
+        mLoadingProgress = findViewById(R.id.loadingProgressBar);
     }
 
+    /*
+     *
+     * method to open the movie details activity when the user clicks on one movie poster
+     *
+     * */
     @Override
     public void onItemClick(View view, int position) {
         Movie movie = mAdapter.getItem(position);
@@ -47,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, view.findViewById(R.id.iv_poster), getString(R.string.transition_poster)).toBundle());
     }
 
+    // task to load movies on the background
     class createMovieList extends AsyncTask<String, Void, List<Movie>> {
 
         @Override
@@ -66,9 +85,25 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 showErrorMessage(getString(R.string.no_movies));
             }
         }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // show loading
+            mLoadingProgress.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showContent(List<Movie> movies) {
+        // stop loading
+        mLoadingProgress.setVisibility(View.INVISIBLE);
+
+        // hide error TextView
+        mEmptyStateTV.setVisibility(View.INVISIBLE);
+
+        // show the movies list
+        mMoviesList.setVisibility(View.VISIBLE);
+
         mAdapter = new MovieAdapter(movies);
         mAdapter.setItemClickListener(this);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
@@ -78,7 +113,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     private void showErrorMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        // stop loading
+        mLoadingProgress.setVisibility(View.INVISIBLE);
+
+        // hide the movies list items
+        mMoviesList.setVisibility(View.INVISIBLE);
+
+        // show the error message
+        mEmptyStateTV.setVisibility(View.VISIBLE);
+        mEmptyStateTV.setText(message);
     }
 
     // this method checks the connectivity and return true when it's connected and false when it's not connected
@@ -100,12 +143,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.popular_movies_action:
-                new createMovieList().execute(POPULAR_MOVIE);
-                setTitle(R.string.popular_movies);
+                if (checkConnectivity()) {
+                    new createMovieList().execute(POPULAR_MOVIE);
+                    setTitle(R.string.popular_movies);
+                } else {
+                    showErrorMessage(getString(R.string.no_internet));
+                }
+
                 return true;
             case R.id.top_rated_movie_action:
-                new createMovieList().execute(TOP_RATED_MOVIE);
-                setTitle(R.string.top_rated_movie);
+                if (checkConnectivity()) {
+                    new createMovieList().execute(TOP_RATED_MOVIE);
+                    setTitle(R.string.top_rated_movie);
+                } else {
+                    showErrorMessage(getString(R.string.no_internet));
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

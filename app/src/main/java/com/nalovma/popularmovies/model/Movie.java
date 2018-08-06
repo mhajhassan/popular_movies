@@ -13,6 +13,18 @@ public class Movie implements Parcelable {
     private String plot;
     private String releaseDate;
 
+    /**
+     * Movie Constructor
+     *
+     * @param id
+     * @param title
+     * @param voteCount
+     * @param voteAverage
+     * @param posterPath
+     * @param backdropPath
+     * @param plot
+     * @param releaseDate
+     */
     public Movie(int id, String title, int voteCount, double voteAverage, String posterPath, String backdropPath, String plot, String releaseDate) {
         this.id = id;
         this.title = title;

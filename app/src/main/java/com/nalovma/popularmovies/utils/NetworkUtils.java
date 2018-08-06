@@ -26,7 +26,6 @@ public class NetworkUtils {
     /**
      * Tag for the log messages
      */
-    public static List<Movie> movieList = new ArrayList<>();
 
     private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
 

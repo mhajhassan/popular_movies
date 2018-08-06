@@ -41,8 +41,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     @Override
     public void onItemClick(View view, int position) {
+        Movie movie = mAdapter.getItem(position);
         Intent intent = new Intent(this, DetailsActivity.class);
-        intent.putExtra(getString(R.string.extra_movie_id), position);
+        intent.putExtra(getString(R.string.extra_movie_id), movie);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, view.findViewById(R.id.iv_poster), getString(R.string.transition_poster)).toBundle());
     }
 
@@ -60,8 +61,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         @Override
         protected void onPostExecute(List<Movie> movies) {
             if (movies != null && !movies.isEmpty()) {
-//                NetworkUtils.movieList.clear();
-                NetworkUtils.movieList.addAll(movies);
                 showContent(movies);
             } else {
                 showErrorMessage(getString(R.string.no_movies));

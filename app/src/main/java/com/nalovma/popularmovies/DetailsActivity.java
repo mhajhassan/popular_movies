@@ -29,8 +29,8 @@ public class DetailsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent.hasExtra(getString(R.string.extra_movie_id))) {
-            int movieId = intent.getIntExtra(getString(R.string.extra_movie_id), -1);
-            Movie movie = NetworkUtils.movieList.get(movieId);
+            Movie movie = (Movie) getIntent().getParcelableExtra(getString(R.string.extra_movie_id));
+
             populateUI(movie);
         }
     }

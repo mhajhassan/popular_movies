@@ -50,6 +50,7 @@ public class DetailsActivity extends AppCompatActivity {
         mReleaseDateTv.setText(movie.getReleaseDate());
         mVoteCountTv.setText(Integer.toString(movie.getVoteCount()));
         mOverviewTv.setText(movie.getPlot());
+        mVoteAverageRb.setRating((float) movie.getVoteAverage()/2);
         Picasso.get()
                 .load(movie.getPosterPath())
                 .placeholder(R.drawable.movie_image)

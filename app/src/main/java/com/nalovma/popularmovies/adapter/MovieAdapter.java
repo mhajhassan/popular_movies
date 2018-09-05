@@ -19,11 +19,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private List<Movie> movieList;
     private ItemClickListener mClickListener;
 
+
     /**
      * Constructs a new {@link MovieAdapter}.
      */
-    public MovieAdapter(List<Movie> movieList) {
-        this.movieList = movieList;
+
+    public MovieAdapter(ItemClickListener mClickListener) {
+        this.mClickListener = mClickListener;
     }
 
     @NonNull
@@ -61,6 +63,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public int getItemCount() {
+        if (movieList == null) return 0;
         return movieList.size();
     }
 
@@ -89,7 +92,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         void onItemClick(View view, int position);
     }
 
-    public void setItemClickListener(ItemClickListener itemClickListener) {
-        mClickListener = itemClickListener;
+    public void setMovieData(List<Movie> movieList) {
+        this.movieList = movieList;
+        notifyDataSetChanged();
     }
 }

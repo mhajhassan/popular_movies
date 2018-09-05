@@ -2,9 +2,16 @@
     <string name="app_name">Popular Movies</string>
     <string name="popular_movies">Popular Movies</string>
     <string name="top_rated_movie">Top Rated Movie</string>
+    <string name="favorites">Favorites</string>
     <string name="no_movies">No Movies found</string>
-    <string name="extra_movie_id">movieId</string>
+    <string name="no_movies_or_internet">No Movies found, or check internet connection</string>
+    <string name="no_favorites">Favorite list is empty</string>
     <string name="transition_poster">transition_poster</string>
     <string name="no_data">No data</string>
     <string name="no_internet">No internet access</string>
+
+    <string name="tab_overview">Overview</string>
+    <string name="tab_videos">Videos</string>
+    <string name="tab_reviews">Reviews</string>
+
 </resources>

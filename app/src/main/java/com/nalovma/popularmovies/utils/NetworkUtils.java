@@ -4,8 +4,9 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.nalovma.popularmovies.R;
 import com.nalovma.popularmovies.model.Movie;
+import com.nalovma.popularmovies.model.MovieReview;
+import com.nalovma.popularmovies.model.MovieVideo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,32 +30,21 @@ public class NetworkUtils {
      */
     private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
 
-    private final static String BASE_URL = "http://api.themoviedb.org/3";
-    private final static String PATH_MOVIES = "movie";
-    private final static String API_KEY = "";
-    private final static String PATH_KEY = "api_key";
-    //image size can be one of this: "w92", "w154", "w185", "w342", "w500", "w780", or "original"
-    private final static String PATH_IMAGE_WIDTH = "w185";
-    // Base url for images
-    private final static String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
 
-    // String Constants for parsing the Json String
-    private static final String RESULTS = "results";
-    private static final String ID = "id";
-    private static final String TITLE = "title";
-    private static final String VOTE_COUNT = "vote_count";
-    private static final String VOTE_AVERAGE = "vote_average";
-    private static final String RELEASE_DATE = "release_date";
-    private static final String OVERVIEW = "overview";
-    private static final String POSTER_PATH = "poster_path";
-    private static final String BACKDROP_PATH = "backdrop_path";
-    // no data string
-    private static final String NO_DATA = "No Data";
-
-
-    public static List<Movie> fetchMoviesData(String requestUrl) {
+    public static List<Movie> fetchMoviesData(String requestUrl, int origin) {
         URL url = createUrl(requestUrl);
-        Log.d("url", url.toString());
+        String jsonResponse = null;
+
+        try {
+            jsonResponse = makeHttpRequest(url);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Failed creating HTTP request", e);
+        }
+        return extractJsonResponse(jsonResponse, origin);
+    }
+
+    public static List<MovieVideo> fetchMovieVideos(String movieId) {
+        URL url = createMovieContentUrl(movieId, Constants.VIDEOS);
         String jsonResponse = null;
 
         try {
@@ -63,7 +53,20 @@ public class NetworkUtils {
             Log.e(LOG_TAG, "Failed creating HTTP request", e);
         }
 
-        return extractJsonResponse(jsonResponse);
+        return extractMovieVideosJsonResponse(jsonResponse);
+    }
+
+    public static List<MovieReview> fetchMovieReviews(String movieId) {
+        URL url = createMovieContentUrl(movieId, Constants.REVIEWS);
+        String jsonResponse = null;
+
+        try {
+            jsonResponse = makeHttpRequest(url);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Failed creating HTTP request", e);
+        }
+
+        return extractMovieReviewsJsonResponse(jsonResponse);
     }
 
     /**
@@ -71,10 +74,10 @@ public class NetworkUtils {
      * http://api.themoviedb.org/3/movie/popular?api_key=[YOUR_API_KEY]
      */
     private static URL createUrl(String sortType) {
-        Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                .appendEncodedPath(PATH_MOVIES)
+        Uri builtUri = Uri.parse(Constants.BASE_URL).buildUpon()
+                .appendEncodedPath(Constants.PATH_MOVIES)
                 .appendEncodedPath(sortType)
-                .appendQueryParameter(PATH_KEY, API_KEY)
+                .appendQueryParameter(Constants.PATH_KEY, Constants.API_KEY)
                 .build();
 
         URL url = null;
@@ -87,13 +90,39 @@ public class NetworkUtils {
         return url;
     }
 
+    private static URL createMovieContentUrl(String movieId, String contentType) {
+        Uri builtUri = Uri.parse(Constants.BASE_URL).buildUpon()
+                .appendEncodedPath(Constants.PATH_MOVIES)
+                .appendEncodedPath(movieId)
+                .appendEncodedPath(contentType)
+                .appendQueryParameter(Constants.PATH_KEY, Constants.API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
     /**
      * Returns new image url
      */
     private static String createImageUrl(String imageCode) {
-        Uri builtUri = Uri.parse(IMAGE_BASE_URL).buildUpon()
-                .appendEncodedPath(PATH_IMAGE_WIDTH)
+        Uri builtUri = Uri.parse(Constants.IMAGE_BASE_URL).buildUpon()
+                .appendEncodedPath(Constants.PATH_IMAGE_WIDTH)
                 .appendEncodedPath(imageCode)
+                .build();
+        return builtUri.toString();
+    }
+
+
+    public static String createYoutubeImageUrl(String key) {
+        Uri builtUri = Uri.parse(Constants.YOUTUBE_IMAGE_BASE_URL).buildUpon()
+                .appendEncodedPath(key)
+                .appendEncodedPath(Constants.YOUTUBE_IMAGE_FILE_EXT)
                 .build();
         return builtUri.toString();
     }
@@ -165,34 +194,84 @@ public class NetworkUtils {
     /*
      * parse the json response
      */
-    private static List<Movie> extractJsonResponse(String response) {
+
+
+    private static List<Movie> extractJsonResponse(String response, int origin) {
         if (TextUtils.isEmpty(response)) {
             return null;
         }
-
         List<Movie> movieList = new ArrayList<>();
 
         try {
             JSONObject baseJsonObject = new JSONObject(response);
-            JSONArray jsonArray = baseJsonObject.optJSONArray(RESULTS);
+            JSONArray jsonArray = baseJsonObject.optJSONArray(Constants.RESULTS);
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject currentMovie = jsonArray.optJSONObject(i);
-                int id = currentMovie.optInt(ID, 0);
-                String title = currentMovie.optString(TITLE, NO_DATA);
-                int voteCount = currentMovie.optInt(VOTE_COUNT, 0);
-                double voteAverage = currentMovie.optDouble(VOTE_AVERAGE, 0.0);
-                String posterPath = currentMovie.optString(POSTER_PATH, NO_DATA);
-                String backdropPath = currentMovie.optString(BACKDROP_PATH, NO_DATA);
-                String plot = currentMovie.optString(OVERVIEW, NO_DATA);
-                String releaseDate = currentMovie.optString(RELEASE_DATE, NO_DATA);
-                Movie movie = new Movie(id, title, voteCount, voteAverage, createImageUrl(posterPath), createImageUrl(backdropPath), plot, releaseDate);
+                int movieId = currentMovie.optInt(Constants.MOVIE_ID, 0);
+                String title = currentMovie.optString(Constants.TITLE, Constants.NO_DATA);
+                int voteCount = currentMovie.optInt(Constants.VOTE_COUNT, 0);
+                double voteAverage = currentMovie.optDouble(Constants.VOTE_AVERAGE, 0.0);
+                double popularity = currentMovie.optDouble(Constants.POPULARITY, 0.0);
+                String posterPath = currentMovie.optString(Constants.POSTER_PATH, Constants.NO_DATA);
+                String backdropPath = currentMovie.optString(Constants.BACKDROP_PATH, Constants.NO_DATA);
+                String overview = currentMovie.optString(Constants.OVERVIEW, Constants.NO_DATA);
+                String releaseDate = currentMovie.optString(Constants.RELEASE_DATE, Constants.NO_DATA);
+
+                Movie movie = new Movie(movieId, title, voteCount, voteAverage, popularity, createImageUrl(posterPath), createImageUrl(backdropPath), overview, releaseDate, origin);
                 movieList.add(movie);
             }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing the JSON results", e);
         }
-
         return movieList;
+    }
+
+    private static List<MovieVideo> extractMovieVideosJsonResponse(String response) {
+        if (TextUtils.isEmpty(response)) {
+            return null;
+        }
+        List<MovieVideo> movieVideoList = new ArrayList<>();
+        try {
+            JSONObject baseJsonObject = new JSONObject(response);
+            JSONArray jsonArray = baseJsonObject.optJSONArray(Constants.RESULTS);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject currentData = jsonArray.optJSONObject(i);
+                String id = currentData.optString(Constants.ID, Constants.NO_DATA);
+                String key = currentData.optString(Constants.KEY, Constants.NO_DATA);
+                String name = currentData.optString(Constants.NAME, Constants.NO_DATA);
+                String site = currentData.optString(Constants.SITE, Constants.NO_DATA);
+                String type = currentData.optString(Constants.TYPE, Constants.NO_DATA);
+                int size = currentData.optInt(Constants.SIZE, 0);
+
+                MovieVideo movieVideo = new MovieVideo(id, key, name, site, type, size);
+                movieVideoList.add(movieVideo);
+            }
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Problem parsing the JSON results", e);
+        }
+        return movieVideoList;
+    }
+
+    private static List<MovieReview> extractMovieReviewsJsonResponse(String response) {
+        if (TextUtils.isEmpty(response)) {
+            return null;
+        }
+        List<MovieReview> movieReviewList = new ArrayList<>();
+        try {
+            JSONObject baseJsonObject = new JSONObject(response);
+            JSONArray jsonArray = baseJsonObject.optJSONArray(Constants.RESULTS);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject currentData = jsonArray.optJSONObject(i);
+                String author = currentData.optString(Constants.AUTHOR, Constants.NO_DATA);
+                String content = currentData.optString(Constants.CONTENT, Constants.NO_DATA);
+
+                MovieReview movieReview = new MovieReview(author, content);
+                movieReviewList.add(movieReview);
+            }
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Problem parsing the JSON results", e);
+        }
+        return movieReviewList;
     }
 }

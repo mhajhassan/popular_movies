@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,12 +48,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         initViews();
 
         GridLayoutManager layoutManager;
+        /*
         int deviceOrientation = getResources().getConfiguration().orientation;
         if (deviceOrientation == Configuration.ORIENTATION_PORTRAIT) {
             layoutManager = new GridLayoutManager(this, 2);
         } else {
             layoutManager = new GridLayoutManager(this, 4);
         }
+        */
+
+        int numOfColumns = calculateNoOfColumns(this);
+        layoutManager = new GridLayoutManager(this, numOfColumns);
 
         mMoviesList.setLayoutManager(layoutManager);
         mMoviesList.setHasFixedSize(true);
@@ -215,6 +221,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(Constants.MENU_SELECTION_INSTANCE_KEY, mMenuSelection);
+        super.onSaveInstanceState(outState);
+    }
 
     private void removeObservers() {
         mMovieViewModel.getMostPopularMovies().removeObserver(mObserver);
@@ -224,6 +235,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     private void deleteMoviesByOrigin(int origin) {
         AppExecutors.getInstance().diskIO().execute(() -> mMovieViewModel.deleteByOrigin(origin));
+    }
+
+    //this method was suggested from the reviewer, this will calculate best number of columns that can i use
+    public static int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int scalingFactor = 200;
+        int noOfColumns = (int) (dpWidth / scalingFactor);
+        if (noOfColumns < 2)
+            noOfColumns = 2;
+        return noOfColumns;
     }
 
     // task to load movies on the background

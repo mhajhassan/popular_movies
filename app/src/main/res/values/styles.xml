@@ -17,4 +17,7 @@
         <item name="cardViewStyle">@style/CardView</item>
     </style>
 
+    <style name="MyTabLayoutTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">@dimen/tv_details_text_size</item>
+    </style>
 </resources>

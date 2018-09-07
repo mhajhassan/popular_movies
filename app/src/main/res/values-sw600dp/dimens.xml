@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="iv_poster_land_layout_width">350dp</dimen>
+
+    <dimen name="iv_poster_port_layout_width">220dp</dimen>
+    <dimen name="iv_poster_port_layout_height">340dp</dimen>
+
+    <dimen name="iv_backdrop_layout_height">380dp</dimen>
+    <dimen name="tv_title_text_size">28sp</dimen>
+    <dimen name="tv_details_text_size">22sp</dimen>
+</resources>
